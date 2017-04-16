@@ -1,0 +1,119 @@
+import java.io.IOException;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.HttpConnection;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class Main {
+
+	public static void main(String[] args) {
+		final String url="https://plants.usda.gov/java/factSheet" ;
+        try {
+        	Document doc = Jsoup.connect(url).timeout(50000).get();
+            Elements container = doc.getElementsByClass("GrayBackgroundColor");
+            Document containerDoc = Jsoup.parse(container.toString());
+            int size = containerDoc.select(".rowon").size();
+            for(int i=0;i<size;i++){
+            	Element tr = containerDoc.select(".rowon").get(0);
+            	Document trDoc = Jsoup.parse(tr.toString());
+            	//String colnorm = trDoc.select("th").get(0).text();
+            	//System.out.println(colnorm);
+            	String  colnorm = trDoc.select("th").get(0).text();//简称
+            	//get_second_level_detail(colnorm);
+            	Element td = trDoc.select("td").get(0);
+            	Document td0Doc = Jsoup.parse(td.toString());
+            	Elements a = td0Doc.select("a");
+            	//Document aDoc = Jsoup.parse(a.toString());
+            	//int scientific_name_size = aDoc.select(".em").size();//scientific name
+            	String scientific_name="";
+            	//for(int j=0;j<scientific_name_size;j++)
+            	//{
+            		//String scientific_name =aDoc.select(".em").get(j).text();
+            	//}
+            	String common_name = trDoc.select("td").get(1).text();
+            	System.out.println(colnorm + " "+"  \n");
+            }
+
+
+        	//get_characteristic("ABAM");
+           //System.out.println("yes");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		//get_characteristic("ABAM");
+	}
+	
+	
+	private static void get_second_level_detail(String name){
+		final String url="view-source:https://plants.usda.gov/core/profile?symbol="+name;
+		try{
+			Document doc = Jsoup.connect(url).timeout(50000).get();
+            Elements container = doc.getElementsByClass("GrayBackgroundColor");
+            Document containerDoc = Jsoup.parse(container.toString());
+            Element content = containerDoc.getElementById("content");
+            Document contentDoc = Jsoup.parse(content.toString());
+            Element tabGeneral = contentDoc.getElementById("tabGeneral");
+            Document tabGeneralDoc = Jsoup.parse(tabGeneral.toString());
+            Elements left = tabGeneralDoc.getElementsByClass("left");
+            Document leftDoc = Jsoup.parse(left.toString());
+            Elements bordered = leftDoc.getElementsByClass("bordered");
+            Document borderedDoc = Jsoup.parse(bordered.toString());
+            
+            Element tr = bordered.select("tr").get(2);
+            Document trDoc = Jsoup.parse(tr.toString());
+            String group = trDoc.select("td").get(1).text();
+            System.out.println(group);
+            
+            Element tr1 = bordered.select("tr").get(3);
+            Document tr1Doc = Jsoup.parse(tr1.toString());
+            String family = tr1Doc.select("td").get(1).text();
+            System.out.println(family);
+            
+            Element tr2 = bordered.select("tr").get(4);
+            Document tr2Doc = Jsoup.parse(tr2.toString());
+            String duration = tr2Doc.select("td").get(1).text();
+            
+            Element tr3 = bordered.select("tr").get(4);
+            Document tr3Doc = Jsoup.parse(tr3.toString());
+            String growth_habit = tr3Doc.select("td").get(1).text();
+            
+            Element tr4 = bordered.select("tr").get(6);
+            Document tr4Doc = Jsoup.parse(tr4.toString());
+            String native_status = tr4Doc.select("td").get(1).text();
+            
+           // get_characteristic(name);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private static void get_characteristic(String name){
+		final String url="https://plants.usda.gov/java/charProfile?symbol="+name;
+		String lable="",value="";
+		try{
+			Document doc = Jsoup.connect(url).timeout(50000).get();
+            Elements container = doc.getElementsByClass("GrayBackgroundColor");
+            Document containerDoc = Jsoup.parse(container.toString());
+            Element table = containerDoc.select("table").get(2);
+            Document tableDoc = Jsoup.parse(table.toString());
+            
+            int size = tableDoc.select("tr").size();
+            
+            for(int i=0;i<size;i++){
+            	Element tr = tableDoc.select("tr").get(i);
+            	Document trDoc = Jsoup.parse(tr.toString());
+            	int trsize = tableDoc.select("td").size();
+            	if(trsize!=1){
+            		lable = trDoc.select("td").get(0).text();
+            		value = trDoc.select("td").get(1).text();
+            	}
+            }
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+}
